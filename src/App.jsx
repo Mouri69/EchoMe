@@ -122,6 +122,25 @@ function App() {
     localStorage.removeItem('echoMeAnalyzer');
   };
 
+  // Clear corrupted localStorage data on first load
+  useEffect(() => {
+    const savedAnalyzerData = localStorage.getItem('echoMeAnalyzer');
+    if (savedAnalyzerData) {
+      try {
+        const parsed = JSON.parse(savedAnalyzerData);
+        // If the data doesn't have the expected structure, clear it
+        if (!parsed.slangWords || !Array.isArray(parsed.slangWords)) {
+          localStorage.removeItem('echoMeAnalyzer');
+          localStorage.removeItem('echoMeMessages');
+        }
+      } catch (error) {
+        // If parsing fails, clear the corrupted data
+        localStorage.removeItem('echoMeAnalyzer');
+        localStorage.removeItem('echoMeMessages');
+      }
+    }
+  }, []);
+
   const personality = analyzer.getPersonalitySummary();
   const adaptationLevel = Math.min(100, personality.messageCount * 15); // Faster adaptation
 

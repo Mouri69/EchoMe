@@ -16,6 +16,11 @@ export class LanguageAnalyzer {
   analyzeMessage(message) {
     this.messageCount++;
     
+    // Ensure slangWords is a Set (safety check for localStorage corruption)
+    if (!(this.slangWords instanceof Set)) {
+      this.slangWords = new Set(Array.isArray(this.slangWords) ? this.slangWords : []);
+    }
+    
     // Word frequency analysis
     const words = message.toLowerCase()
       .replace(/[^\w\s]/g, ' ')
