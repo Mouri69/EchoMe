@@ -1,0 +1,319 @@
+.word-cloud-container {
+  color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.word-cloud-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Word Cloud Content */
+.word-cloud-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.cloud-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+/* Word Cloud */
+.word-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.cloud-word {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: floatIn 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.cloud-word:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes floatIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Emoji Cloud */
+.emoji-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.cloud-emoji {
+  display: inline-block;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: floatIn 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.cloud-emoji:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.2) rotate(5deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Slang Cloud */
+.slang-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.cloud-slang {
+  display: inline-block;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #ff6b6b, #feca57);
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: floatIn 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cloud-slang:hover {
+  background: linear-gradient(135deg, #ff5252, #ff9800);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+/* Stats Summary */
+.cloud-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #48dbfb;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .word-cloud-title {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+  
+  .word-cloud-content {
+    gap: 15px;
+  }
+  
+  .cloud-section {
+    gap: 10px;
+  }
+  
+  .section-title {
+    font-size: 0.8rem;
+  }
+  
+  .word-cloud,
+  .emoji-cloud,
+  .slang-cloud {
+    padding: 8px;
+    min-height: 50px;
+  }
+  
+  .cloud-word {
+    padding: 3px 6px;
+    font-size: 0.8rem;
+  }
+  
+  .cloud-emoji {
+    padding: 6px;
+  }
+  
+  .cloud-slang {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+  
+  .cloud-stats {
+    gap: 8px;
+    padding-top: 15px;
+  }
+  
+  .stat-card {
+    padding: 8px 6px;
+  }
+  
+  .stat-number {
+    font-size: 1.2rem;
+  }
+  
+  .stat-label {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .word-cloud-title {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+  
+  .word-cloud-content {
+    gap: 12px;
+  }
+  
+  .section-title {
+    font-size: 0.75rem;
+  }
+  
+  .word-cloud,
+  .emoji-cloud,
+  .slang-cloud {
+    padding: 6px;
+    min-height: 40px;
+    gap: 6px;
+  }
+  
+  .cloud-word {
+    padding: 2px 4px;
+    font-size: 0.75rem;
+  }
+  
+  .cloud-emoji {
+    padding: 4px;
+  }
+  
+  .cloud-slang {
+    padding: 3px 6px;
+    font-size: 0.65rem;
+  }
+  
+  .cloud-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding-top: 12px;
+  }
+  
+  .stat-card {
+    padding: 6px 4px;
+  }
+  
+  .stat-number {
+    font-size: 1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.55rem;
+  }
+} 
