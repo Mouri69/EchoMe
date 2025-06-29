@@ -204,6 +204,8 @@ Assistant:`;
         return false;
       }
 
+      console.log('Testing Hugging Face connection with token:', token.substring(0, 10) + '...');
+
       // Test with a simple model
       const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
         method: 'POST',
@@ -219,7 +221,18 @@ Assistant:`;
         })
       });
 
-      return response.ok || response.status === 503; // 503 means model is loading
+      console.log('Hugging Face response status:', response.status);
+      
+      if (response.ok) {
+        console.log('Hugging Face connection successful');
+        return true;
+      } else if (response.status === 503) {
+        console.log('Hugging Face model is loading (503) - this is normal');
+        return true; // 503 means model is loading, which is fine
+      } else {
+        console.error('Hugging Face error:', response.status, response.statusText);
+        return false;
+      }
     } catch (error) {
       console.error('Hugging Face status check error:', error);
       return false;
