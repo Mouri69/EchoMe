@@ -4,55 +4,68 @@
 export class PersonalityEngine {
   constructor() {
     this.baseResponses = [
-      "Hello! How are you today?",
-      "That's interesting. Tell me more.",
-      "I see what you mean.",
-      "Thanks for sharing that with me.",
-      "What's on your mind?",
-      "That sounds like quite a situation.",
-      "I'm here to listen.",
-      "How does that make you feel?",
-      "That's a good point.",
-      "I understand what you're saying."
+      "Hello! How are you today? I'm here to chat with you.",
+      "That's really interesting! Tell me more about that.",
+      "I see what you mean. That makes a lot of sense.",
+      "Thanks for sharing that with me. I appreciate you opening up.",
+      "What's on your mind? I'm here to listen and chat.",
+      "That sounds like quite a situation. How are you feeling about it?",
+      "I'm here to listen. Sometimes talking helps sort things out.",
+      "How does that make you feel? Emotions can be complicated.",
+      "That's a good point. You've got a unique perspective on this.",
+      "I understand what you're saying. It's important to be heard."
     ];
     
     this.casualResponses = [
-      "yo what's up",
-      "that's wild fr",
-      "bruh moment",
-      "no cap that's crazy",
-      "slay",
-      "periodt",
-      "bussin fr fr",
-      "yeet",
-      "omg same",
-      "literally me"
+      "yo what's up, how's your day going?",
+      "that's wild fr, tell me more about that",
+      "bruh moment for real, that's crazy",
+      "no cap that's actually insane, what happened next?",
+      "slay bestie, you're doing great",
+      "periodt, that's all there is to it",
+      "bussin fr fr, sounds like a good time",
+      "yeet, that's the energy we need",
+      "omg same, I totally get what you mean",
+      "literally me, that's exactly how I feel"
     ];
     
     this.aggressiveResponses = [
-      "damn chill out",
-      "bruh relax",
-      "you good?",
-      "what's got you so worked up",
-      "take a breath",
-      "calm down",
-      "you're wilding",
-      "that's a lot",
-      "woah there",
-      "easy tiger"
+      "damn chill out, what's got you so worked up?",
+      "bruh relax, take a breath and tell me what's going on",
+      "you good? seems like something's really bothering you",
+      "what's got you so worked up? sometimes we need to vent",
+      "take a breath, whatever it is we can figure it out",
+      "calm down, I'm here to listen if you want to talk",
+      "you're wilding right now, what's the deal?",
+      "that's a lot of energy, what's on your mind?",
+      "woah there, something's clearly got you fired up",
+      "easy tiger, let's talk about what's really going on"
     ];
     
     this.emotionalResponses = [
-      "aww that's so sweet! 😊",
-      "omg that's amazing! ✨",
-      "that's rough buddy 😔",
-      "yasss queen! 👑",
-      "nooo that's terrible! 😭",
-      "slay bestie! 💅",
-      "periodt! 💯",
-      "literally crying rn 😢",
-      "manifesting this for you! 🌟",
-      "vibes are immaculate! ✨"
+      "aww that's so sweet! 😊 you have such a good heart",
+      "omg that's amazing! ✨ you should be proud of yourself",
+      "that's rough buddy 😔 but you're strong enough to handle it",
+      "yasss queen! 👑 you're absolutely killing it",
+      "nooo that's terrible! 😭 I'm so sorry you're going through that",
+      "slay bestie! 💅 you're doing amazing and I'm here for you",
+      "periodt! 💯 that's the confidence we love to see",
+      "literally crying rn 😢 your story is so touching",
+      "manifesting this for you! 🌟 good things are coming your way",
+      "vibes are immaculate! ✨ you're radiating positive energy"
+    ];
+    
+    this.conversationalResponses = [
+      "That's really interesting! I'd love to hear more about your thoughts on that.",
+      "You know what, that reminds me of something similar. What do you think about...",
+      "I can totally see where you're coming from. Have you ever considered...",
+      "That's a fascinating perspective. It makes me wonder about...",
+      "You've got a point there. It's like when people say...",
+      "I'm curious about your take on this. What's your experience been like?",
+      "That's something I've been thinking about too. Do you think...",
+      "You're absolutely right about that. It's similar to how...",
+      "That's a great observation. It makes me think about...",
+      "I love how you think about things. Have you noticed that..."
     ];
   }
 
@@ -63,10 +76,21 @@ export class PersonalityEngine {
     // Check for aggressive language in user message
     const isAggressive = this.detectAggression(userMessage);
     
+    // Check for questions to provide more engaging responses
+    const isQuestion = userMessage.includes('?') || 
+                      userMessage.toLowerCase().includes('what') || 
+                      userMessage.toLowerCase().includes('how') || 
+                      userMessage.toLowerCase().includes('why') ||
+                      userMessage.toLowerCase().includes('when') ||
+                      userMessage.toLowerCase().includes('where');
+    
     // Early responses are more generic but can still be contextual
     if (messageCount < 3) {
       if (isAggressive) {
         return this.getAggressiveResponse(personality);
+      }
+      if (isQuestion) {
+        return this.getConversationalResponse(personality, userMessage);
       }
       return this.getGenericResponse();
     }
@@ -79,6 +103,8 @@ export class PersonalityEngine {
     
     if (isAggressive) {
       response = this.getAggressiveResponse(personality);
+    } else if (isQuestion && adaptationLevel > 30) {
+      response = this.getConversationalResponse(personality, userMessage);
     } else if (isCasual && adaptationLevel > 20) { // Lower threshold
       response = this.getCasualResponse(personality);
     } else if (isFormal) {
@@ -284,5 +310,27 @@ export class PersonalityEngine {
     ];
     
     return nightResponses[Math.floor(Math.random() * nightResponses.length)];
+  }
+
+  getConversationalResponse(personality, userMessage) {
+    const { topWords, slangWords } = personality;
+    
+    let response = this.conversationalResponses[Math.floor(Math.random() * this.conversationalResponses.length)];
+    
+    // Add user's words if available
+    if (topWords.length > 0) {
+      const userWord = topWords[0].word;
+      if (Math.random() > 0.4) {
+        response = response.replace(/...$/, `${userWord}...`);
+      }
+    }
+
+    // Add slang if user uses it
+    if (slangWords.length > 0 && Math.random() > 0.3) {
+      const userSlang = slangWords[Math.floor(Math.random() * slangWords.length)];
+      response = `${response} ${userSlang}`;
+    }
+
+    return response;
   }
 } 
