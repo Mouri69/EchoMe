@@ -26,7 +26,17 @@ function App() {
     
     if (savedAnalyzerData) {
       const newAnalyzer = new LanguageAnalyzer();
-      Object.assign(newAnalyzer, JSON.parse(savedAnalyzerData));
+      const parsedData = JSON.parse(savedAnalyzerData);
+      
+      // Restore Set objects properly
+      newAnalyzer.wordFrequency = parsedData.wordFrequency || {};
+      newAnalyzer.sentenceLengths = parsedData.sentenceLengths || [];
+      newAnalyzer.punctuationPatterns = parsedData.punctuationPatterns || {};
+      newAnalyzer.emojiUsage = parsedData.emojiUsage || {};
+      newAnalyzer.slangWords = new Set(parsedData.slangWords || []);
+      newAnalyzer.formalityScore = parsedData.formalityScore || 0;
+      newAnalyzer.messageCount = parsedData.messageCount || 0;
+      
       setAnalyzer(newAnalyzer);
     }
 
@@ -38,7 +48,19 @@ function App() {
   // Save messages and analyzer data to localStorage
   useEffect(() => {
     localStorage.setItem('echoMeMessages', JSON.stringify(messages));
-    localStorage.setItem('echoMeAnalyzer', JSON.stringify(analyzer));
+    
+    // Convert Set to array for localStorage
+    const analyzerData = {
+      wordFrequency: analyzer.wordFrequency,
+      sentenceLengths: analyzer.sentenceLengths,
+      punctuationPatterns: analyzer.punctuationPatterns,
+      emojiUsage: analyzer.emojiUsage,
+      slangWords: Array.from(analyzer.slangWords),
+      formalityScore: analyzer.formalityScore,
+      messageCount: analyzer.messageCount
+    };
+    
+    localStorage.setItem('echoMeAnalyzer', JSON.stringify(analyzerData));
   }, [messages, analyzer]);
 
   const handleSendMessage = (message) => {
