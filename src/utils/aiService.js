@@ -195,6 +195,49 @@ Assistant:`;
     }
   }
 
+  // Check if Hugging Face is available
+  async checkHuggingFaceStatus() {
+    try {
+      const token = process.env.REACT_APP_HUGGINGFACE_TOKEN;
+      if (!token) {
+        console.error('Hugging Face token not found');
+        return false;
+      }
+
+      // Test with a simple model
+      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          inputs: 'Hello',
+          parameters: {
+            max_new_tokens: 10
+          }
+        })
+      });
+
+      return response.ok || response.status === 503; // 503 means model is loading
+    } catch (error) {
+      console.error('Hugging Face status check error:', error);
+      return false;
+    }
+  }
+
+  // Check AI status based on provider
+  async checkAIStatus() {
+    switch (this.provider) {
+      case 'ollama':
+        return await this.checkOllamaStatus();
+      case 'huggingface':
+        return await this.checkHuggingFaceStatus();
+      default:
+        return true; // Fallback always works
+    }
+  }
+
   // Get available models from Ollama
   async getAvailableModels() {
     try {

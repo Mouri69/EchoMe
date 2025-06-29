@@ -7,28 +7,23 @@ const AISettings = ({ aiService, onSettingsChange }) => {
   const [model, setModel] = useState('llama2');
   const [availableModels, setAvailableModels] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState('checking');
+  const [isConnected, setIsConnected] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
-    checkAIStatus();
-  }, []);
+    checkStatus();
+  }, [provider]);
 
-  const checkAIStatus = async () => {
-    setIsLoading(true);
-    setStatus('checking');
-    
+  const checkStatus = async () => {
+    setIsChecking(true);
     try {
-      const isAvailable = await aiService.checkOllamaStatus();
-      setStatus(isAvailable ? 'connected' : 'disconnected');
-      
-      if (isAvailable) {
-        const models = await aiService.getAvailableModels();
-        setAvailableModels(models);
-      }
+      const isConnected = await aiService.checkAIStatus();
+      setIsConnected(isConnected);
     } catch (error) {
-      setStatus('error');
+      console.error('Status check error:', error);
+      setIsConnected(false);
     } finally {
-      setIsLoading(false);
+      setIsChecking(false);
     }
   };
 
@@ -45,21 +40,13 @@ const AISettings = ({ aiService, onSettingsChange }) => {
   };
 
   const getStatusColor = () => {
-    switch (status) {
-      case 'connected': return '#4CAF50';
-      case 'disconnected': return '#f44336';
-      case 'error': return '#ff9800';
-      default: return '#9e9e9e';
-    }
+    if (isChecking) return '#ffa500'; // Orange for checking
+    return isConnected ? '#4CAF50' : '#f44336'; // Green for connected, red for disconnected
   };
 
   const getStatusText = () => {
-    switch (status) {
-      case 'connected': return 'Connected';
-      case 'disconnected': return 'Disconnected';
-      case 'error': return 'Error';
-      default: return 'Checking...';
-    }
+    if (isChecking) return 'Checking...';
+    return isConnected ? 'Connected' : 'Disconnected';
   };
 
   return (
@@ -94,10 +81,10 @@ const AISettings = ({ aiService, onSettingsChange }) => {
             </div>
             <button 
               className="refresh-button"
-              onClick={checkAIStatus}
-              disabled={isLoading}
+              onClick={checkStatus}
+              disabled={isChecking}
             >
-              {isLoading ? '⏳' : '🔄'}
+              {isChecking ? '⏳' : '🔄'}
             </button>
           </div>
 
