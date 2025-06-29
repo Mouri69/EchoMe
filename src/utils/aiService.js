@@ -198,9 +198,15 @@ Assistant:`;
   // Check if Hugging Face is available
   async checkHuggingFaceStatus() {
     try {
+      console.log('All environment variables:', process.env);
+      console.log('Looking for REACT_APP_HUGGINGFACE_TOKEN...');
+      
       const token = process.env.REACT_APP_HUGGINGFACE_TOKEN;
+      console.log('Token found:', token ? 'YES' : 'NO');
+      
       if (!token) {
         console.error('Hugging Face token not found');
+        console.error('Available REACT_APP_ variables:', Object.keys(process.env).filter(key => key.startsWith('REACT_APP_')));
         return false;
       }
 

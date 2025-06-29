@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import ChatWindow from './components/ChatWindow';
 import InputBox from './components/InputBox';
 import ProgressBar from './components/ProgressBar';
 import WordCloud from './components/WordCloud';
 import AISettings from './components/AISettings';
-import { LanguageAnalyzer } from './utils/languageAnalysis';
+import { analyzeLanguage } from './utils/languageAnalysis';
 import { PersonalityEngine } from './utils/personalityEngine';
 import { AIService } from './utils/aiService';
+import './test-env.js'; // Temporary test import
 
 function App() {
   const [messages, setMessages] = useState([]);
