@@ -4,16 +4,21 @@ import ChatWindow from './components/ChatWindow';
 import InputBox from './components/InputBox';
 import ProgressBar from './components/ProgressBar';
 import WordCloud from './components/WordCloud';
+import AISettings from './components/AISettings';
 import { LanguageAnalyzer } from './utils/languageAnalysis';
 import { PersonalityEngine } from './utils/personalityEngine';
+import { AIService } from './utils/aiService';
 
 function App() {
   const [messages, setMessages] = useState([]);
   const [analyzer, setAnalyzer] = useState(new LanguageAnalyzer());
   const [personalityEngine] = useState(new PersonalityEngine());
+  const [aiService] = useState(new AIService());
   const [isNightMode, setIsNightMode] = useState(false);
   const [isRoastMode, setIsRoastMode] = useState(false);
   const [showWordCloud, setShowWordCloud] = useState(false);
+  const [useAI, setUseAI] = useState(false);
+  const [aiStatus, setAiStatus] = useState('checking');
 
   // Load messages from localStorage on mount
   useEffect(() => {
@@ -63,7 +68,7 @@ function App() {
     localStorage.setItem('echoMeAnalyzer', JSON.stringify(analyzerData));
   }, [messages, analyzer]);
 
-  const handleSendMessage = (message) => {
+  const handleSendMessage = async (message) => {
     if (!message.trim()) return;
 
     // Add user message
@@ -83,7 +88,7 @@ function App() {
     setAnalyzer(newAnalyzer);
 
     // Generate response
-    setTimeout(() => {
+    setTimeout(async () => {
       const personality = newAnalyzer.getPersonalitySummary();
       let response;
       
@@ -91,16 +96,25 @@ function App() {
       const aggressiveWords = ['fuck', 'shit', 'damn', 'bitch', 'ass', 'hell', 'dumb', 'stupid', 'idiot', 'moron'];
       const isAggressive = aggressiveWords.some(word => message.toLowerCase().includes(word));
       
-      if (isRoastMode) {
-        response = personalityEngine.generateRoastResponse(personality);
-      } else if (isAggressive) {
-        // Prioritize aggressive response over night mode
-        response = personalityEngine.generateResponse(personality, message);
-      } else if (isNightMode && personality.messageCount < 5) {
-        // Only use night mode for early messages when not aggressive
-        response = personalityEngine.generateNightResponse(personality);
-      } else {
-        // Use adaptive personality response
+      try {
+        if (useAI && aiStatus === 'connected') {
+          // Use AI service
+          response = await aiService.generateResponse(message, personality);
+        } else if (isRoastMode) {
+          response = personalityEngine.generateRoastResponse(personality);
+        } else if (isAggressive) {
+          // Prioritize aggressive response over night mode
+          response = personalityEngine.generateResponse(personality, message);
+        } else if (isNightMode && personality.messageCount < 5) {
+          // Only use night mode for early messages when not aggressive
+          response = personalityEngine.generateNightResponse(personality);
+        } else {
+          // Use adaptive personality response
+          response = personalityEngine.generateResponse(personality, message);
+        }
+      } catch (error) {
+        console.error('Response generation error:', error);
+        // Fallback to personality engine
         response = personalityEngine.generateResponse(personality, message);
       }
 
@@ -183,6 +197,18 @@ function App() {
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleAISettingsChange = (provider, model) => {
+    aiService.setProvider(provider, model);
+    setUseAI(provider !== 'fallback');
+    
+    // Check AI status
+    aiService.checkOllamaStatus().then(isAvailable => {
+      setAiStatus(isAvailable ? 'connected' : 'disconnected');
+    }).catch(() => {
+      setAiStatus('error');
+    });
   };
 
   // Clear corrupted localStorage data on first load
@@ -274,6 +300,11 @@ function App() {
             >
               📁
             </button>
+            
+            <AISettings 
+              aiService={aiService}
+              onSettingsChange={handleAISettingsChange}
+            />
           </div>
         </header>
 
