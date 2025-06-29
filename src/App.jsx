@@ -122,6 +122,69 @@ function App() {
     localStorage.removeItem('echoMeAnalyzer');
   };
 
+  const exportPersonality = () => {
+    const personalityData = {
+      messages: messages,
+      analyzer: {
+        wordFrequency: analyzer.wordFrequency,
+        sentenceLengths: analyzer.sentenceLengths,
+        punctuationPatterns: analyzer.punctuationPatterns,
+        emojiUsage: analyzer.emojiUsage,
+        slangWords: Array.from(analyzer.slangWords),
+        formalityScore: analyzer.formalityScore,
+        messageCount: analyzer.messageCount
+      },
+      timestamp: new Date().toISOString(),
+      version: '1.0'
+    };
+    
+    const dataStr = JSON.stringify(personalityData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `echo-me-personality-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+  };
+
+  const importPersonality = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        
+        if (data.messages && data.analyzer) {
+          setMessages(data.messages);
+          
+          const newAnalyzer = new LanguageAnalyzer();
+          newAnalyzer.wordFrequency = data.analyzer.wordFrequency || {};
+          newAnalyzer.sentenceLengths = data.analyzer.sentenceLengths || [];
+          newAnalyzer.punctuationPatterns = data.analyzer.punctuationPatterns || {};
+          newAnalyzer.emojiUsage = data.analyzer.emojiUsage || {};
+          newAnalyzer.slangWords = new Set(data.analyzer.slangWords || []);
+          newAnalyzer.formalityScore = data.analyzer.formalityScore || 0;
+          newAnalyzer.messageCount = data.analyzer.messageCount || 0;
+          
+          setAnalyzer(newAnalyzer);
+          
+          alert('Personality imported successfully!');
+        } else {
+          alert('Invalid personality file format.');
+        }
+      } catch (error) {
+        alert('Error importing personality file.');
+        console.error(error);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   // Clear corrupted localStorage data on first load
   useEffect(() => {
     const savedAnalyzerData = localStorage.getItem('echoMeAnalyzer');
@@ -187,6 +250,29 @@ function App() {
               title="Reset Personality"
             >
               🔄
+            </button>
+            
+            <button 
+              className="export-button"
+              onClick={exportPersonality}
+              title="Export Personality"
+            >
+              💾
+            </button>
+            
+            <input
+              type="file"
+              id="import-file"
+              accept=".json"
+              onChange={importPersonality}
+              style={{ display: 'none' }}
+            />
+            <button 
+              className="import-button"
+              onClick={() => document.getElementById('import-file').click()}
+              title="Import Personality"
+            >
+              📁
             </button>
           </div>
         </header>

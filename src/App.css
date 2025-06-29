@@ -67,7 +67,9 @@
 
 .mode-toggle,
 .word-cloud-toggle,
-.reset-button {
+.reset-button,
+.export-button,
+.import-button {
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
@@ -81,7 +83,9 @@
 
 .mode-toggle:hover,
 .word-cloud-toggle:hover,
-.reset-button:hover {
+.reset-button:hover,
+.export-button:hover,
+.import-button:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
@@ -194,7 +198,9 @@
   
   .mode-toggle,
   .word-cloud-toggle,
-  .reset-button {
+  .reset-button,
+  .export-button,
+  .import-button {
     padding: 10px;
     font-size: 1rem;
   }
