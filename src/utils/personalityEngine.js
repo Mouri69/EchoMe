@@ -29,6 +29,19 @@ export class PersonalityEngine {
       "literally me"
     ];
     
+    this.aggressiveResponses = [
+      "damn chill out",
+      "bruh relax",
+      "you good?",
+      "what's got you so worked up",
+      "take a breath",
+      "calm down",
+      "you're wilding",
+      "that's a lot",
+      "woah there",
+      "easy tiger"
+    ];
+    
     this.emotionalResponses = [
       "aww that's so sweet! 😊",
       "omg that's amazing! ✨",
@@ -47,18 +60,26 @@ export class PersonalityEngine {
   generateResponse(personality, userMessage) {
     const { messageCount, isCasual, isFormal, topWords, topEmojis, slangWords, formalityScore } = personality;
     
-    // Early responses are more generic
+    // Check for aggressive language in user message
+    const isAggressive = this.detectAggression(userMessage);
+    
+    // Early responses are more generic but can still be contextual
     if (messageCount < 3) {
+      if (isAggressive) {
+        return this.getAggressiveResponse(personality);
+      }
       return this.getGenericResponse();
     }
 
     // Calculate adaptation level (0-100)
-    const adaptationLevel = Math.min(100, messageCount * 10);
+    const adaptationLevel = Math.min(100, messageCount * 15); // Faster adaptation
     
-    // Choose response style based on user's formality
+    // Choose response style based on user's formality and aggression
     let response = '';
     
-    if (isCasual && adaptationLevel > 30) {
+    if (isAggressive) {
+      response = this.getAggressiveResponse(personality);
+    } else if (isCasual && adaptationLevel > 20) { // Lower threshold
       response = this.getCasualResponse(personality);
     } else if (isFormal) {
       response = this.getFormalResponse(personality);
@@ -67,17 +88,17 @@ export class PersonalityEngine {
     }
 
     // Add user's favorite words if adaptation is high enough
-    if (adaptationLevel > 50 && topWords.length > 0) {
+    if (adaptationLevel > 30 && topWords.length > 0) { // Lower threshold
       response = this.injectUserWords(response, topWords);
     }
 
     // Add user's emojis if they use them
-    if (adaptationLevel > 40 && topEmojis.length > 0) {
+    if (adaptationLevel > 25 && topEmojis.length > 0) { // Lower threshold
       response = this.injectUserEmojis(response, topEmojis);
     }
 
     // Add user's slang if they use it
-    if (adaptationLevel > 60 && slangWords.length > 0) {
+    if (adaptationLevel > 40 && slangWords.length > 0) { // Lower threshold
       response = this.injectUserSlang(response, slangWords);
     }
 
@@ -87,8 +108,40 @@ export class PersonalityEngine {
     return response;
   }
 
+  detectAggression(message) {
+    const aggressiveWords = [
+      'fuck', 'shit', 'damn', 'bitch', 'ass', 'hell', 'dumb', 'stupid',
+      'idiot', 'moron', 'fucking', 'stupid', 'useless', 'worthless'
+    ];
+    
+    const lowerMessage = message.toLowerCase();
+    return aggressiveWords.some(word => lowerMessage.includes(word));
+  }
+
   getGenericResponse() {
     return this.baseResponses[Math.floor(Math.random() * this.baseResponses.length)];
+  }
+
+  getAggressiveResponse(personality) {
+    const { topWords, slangWords } = personality;
+    
+    let response = this.aggressiveResponses[Math.floor(Math.random() * this.aggressiveResponses.length)];
+    
+    // Add some user's words if available
+    if (topWords.length > 0) {
+      const userWord = topWords[0].word;
+      if (Math.random() > 0.6) {
+        response = `${userWord} ${response}`;
+      }
+    }
+
+    // Add slang if user uses it
+    if (slangWords.length > 0 && Math.random() > 0.5) {
+      const userSlang = slangWords[Math.floor(Math.random() * slangWords.length)];
+      response = `${response} ${userSlang}`;
+    }
+
+    return response;
   }
 
   getCasualResponse(personality) {
@@ -99,9 +152,15 @@ export class PersonalityEngine {
     // Add some user's words if available
     if (topWords.length > 0) {
       const userWord = topWords[0].word;
-      if (Math.random() > 0.5) {
+      if (Math.random() > 0.4) { // Higher chance
         response = `${userWord} ${response}`;
       }
+    }
+
+    // Add slang more frequently
+    if (slangWords.length > 0 && Math.random() > 0.3) {
+      const userSlang = slangWords[Math.floor(Math.random() * slangWords.length)];
+      response = `${response} ${userSlang}`;
     }
 
     return response;
@@ -129,8 +188,8 @@ export class PersonalityEngine {
     
     const userWord = topWords[Math.floor(Math.random() * Math.min(3, topWords.length))].word;
     
-    // 30% chance to inject a user word
-    if (Math.random() < 0.3) {
+    // 50% chance to inject a user word (increased)
+    if (Math.random() < 0.5) {
       const words = response.split(' ');
       const insertIndex = Math.floor(Math.random() * words.length);
       words.splice(insertIndex, 0, userWord);
@@ -145,8 +204,8 @@ export class PersonalityEngine {
     
     const userEmoji = topEmojis[Math.floor(Math.random() * topEmojis.length)].emoji;
     
-    // 40% chance to add user's emoji
-    if (Math.random() < 0.4) {
+    // 60% chance to add user's emoji (increased)
+    if (Math.random() < 0.6) {
       return `${response} ${userEmoji}`;
     }
     
@@ -158,8 +217,8 @@ export class PersonalityEngine {
     
     const userSlang = slangWords[Math.floor(Math.random() * slangWords.length)];
     
-    // 25% chance to add user's slang
-    if (Math.random() < 0.25) {
+    // 40% chance to add user's slang (increased)
+    if (Math.random() < 0.4) {
       return `${response} ${userSlang}`;
     }
     
@@ -205,7 +264,7 @@ export class PersonalityEngine {
       const userEmoji = personality.topEmojis[0].emoji;
       roast = `${roast} ${userEmoji}`;
     }
-    
+
     return roast;
   }
 

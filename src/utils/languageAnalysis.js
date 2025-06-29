@@ -47,7 +47,9 @@ export class LanguageAnalyzer {
     // Slang detection
     const slangPatterns = [
       'bro', 'bruh', 'fr', 'tbh', 'imo', 'btw', 'idk', 'lol', 'omg', 'wtf',
-      'yeet', 'slay', 'periodt', 'no cap', 'bussin', 'finna', 'gonna', 'wanna'
+      'yeet', 'slay', 'periodt', 'no cap', 'bussin', 'finna', 'gonna', 'wanna',
+      'fuck', 'shit', 'damn', 'bitch', 'ass', 'hell', 'dumb', 'stupid', 'idiot',
+      'nigga', 'fucking', 'useless', 'worthless', 'piece', 'shit'
     ];
     
     slangPatterns.forEach(slang => {
@@ -68,6 +70,11 @@ export class LanguageAnalyzer {
     if (message.includes('!')) score -= 5;
     if (message.includes('😊') || message.includes('😎') || message.includes('💀')) score -= 10;
     if (message.includes("'") && message.includes("'")) score -= 5; // Contractions
+    
+    // Aggressive language detection
+    const aggressiveWords = ['fuck', 'shit', 'damn', 'bitch', 'ass', 'hell', 'dumb', 'stupid', 'idiot', 'moron'];
+    const hasAggressiveLanguage = aggressiveWords.some(word => message.toLowerCase().includes(word));
+    if (hasAggressiveLanguage) score -= 30; // Very casual/aggressive
     
     // Factors that make it more formal
     if (message.includes('please') || message.includes('thank you')) score += 10;

@@ -65,11 +65,20 @@ function App() {
       const personality = newAnalyzer.getPersonalitySummary();
       let response;
       
+      // Check for aggressive language first
+      const aggressiveWords = ['fuck', 'shit', 'damn', 'bitch', 'ass', 'hell', 'dumb', 'stupid', 'idiot', 'moron'];
+      const isAggressive = aggressiveWords.some(word => message.toLowerCase().includes(word));
+      
       if (isRoastMode) {
         response = personalityEngine.generateRoastResponse(personality);
-      } else if (isNightMode) {
+      } else if (isAggressive) {
+        // Prioritize aggressive response over night mode
+        response = personalityEngine.generateResponse(personality, message);
+      } else if (isNightMode && personality.messageCount < 5) {
+        // Only use night mode for early messages when not aggressive
         response = personalityEngine.generateNightResponse(personality);
       } else {
+        // Use adaptive personality response
         response = personalityEngine.generateResponse(personality, message);
       }
 
@@ -92,7 +101,7 @@ function App() {
   };
 
   const personality = analyzer.getPersonalitySummary();
-  const adaptationLevel = Math.min(100, personality.messageCount * 10);
+  const adaptationLevel = Math.min(100, personality.messageCount * 15); // Faster adaptation
 
   return (
     <div className={`app ${isNightMode ? 'night-mode' : ''}`}>
